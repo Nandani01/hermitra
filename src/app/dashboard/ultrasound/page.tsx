@@ -4,47 +4,32 @@ import type React from "react"
 
 import { useState } from "react"
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import {
-  Heart,
-  Home,
-  Upload,
-  ImageIcon,
-  CheckCircle,
-  AlertCircle,
-  Sparkles,
-  ArrowLeft,
-  FileImage,
-  Zap,
-} from "lucide-react"
+import { Upload, Camera, FileImage, CheckCircle, AlertCircle, ArrowLeft } from "lucide-react"
 
-export default function UltrasoundPage() {
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null)
+export default function UltrasoundDetection() {
+  const [uploadedImage, setUploadedImage] = useState<string | null>(null)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [analysisComplete, setAnalysisComplete] = useState(false)
   const [analysisResult, setAnalysisResult] = useState<{
     detected: boolean
     confidence: number
     recommendations: string[]
   } | null>(null)
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
-      setUploadedFile(file)
-      setAnalysisComplete(false)
-      setAnalysisResult(null)
+      const reader = new FileReader()
+      reader.onload = (e) => {
+        setUploadedImage(e.target?.result as string)
+        setAnalysisResult(null)
+      }
+      reader.readAsDataURL(file)
     }
   }
 
-  const handleAnalyze = () => {
-    if (!uploadedFile) return
-
+  const analyzeImage = () => {
     setIsAnalyzing(true)
-    
+
     // Simulate AI analysis
     setTimeout(() => {
       const mockResult = {
@@ -54,247 +39,212 @@ export default function UltrasoundPage() {
           "Consult with a gynecologist for professional evaluation",
           "Consider lifestyle modifications including diet and exercise",
           "Monitor symptoms and track menstrual cycles",
-          "Follow up with regular medical checkups"
-        ]
+          "Follow up with regular medical checkups",
+        ],
       }
-      
       setAnalysisResult(mockResult)
       setIsAnalyzing(false)
-      setAnalysisComplete(true)
     }, 3000)
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50">
-      {/* Navigation */}
-      <nav className="bg-white/80 backdrop-blur-xl shadow-sm border-b border-white/20 sticky top-0 z-50">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <Link href="/" className="flex items-center hover:opacity-80 transition-opacity duration-300">
-              <div className="relative">
-                <div className="w-8 h-8 bg-gradient-to-r from-pink-500 to-purple-600 rounded-lg flex items-center justify-center">
-                  <Heart className="h-5 w-5 text-white" />
-                </div>
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
-                  <Sparkles className="h-2 w-2 text-white" />
-                </div>
+            <Link href="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
+              <div className="w-10 h-10 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full flex items-center justify-center">
+                <span className="text-white font-bold text-lg">H</span>
               </div>
-              <span className="ml-2 text-xl font-bold bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent">
+              <span className="text-2xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
                 Hermitra
               </span>
             </Link>
-            <div className="flex items-center space-x-4">
-              <Link
-                href="/dashboard"
-                className="flex items-center text-gray-700 hover:text-purple-600 font-medium px-3 py-2 hover:bg-purple-50 rounded-lg transition-all duration-300 text-sm"
-              >
-                <Home className="h-4 w-4 mr-1" />
-                Dashboard
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
 
-      {/* Header */}
-      <section className="py-12 px-4">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex items-center mb-8">
             <Link
               href="/dashboard"
-              className="flex items-center text-purple-600 hover:text-purple-700 font-medium transition-colors duration-300 mr-4"
+              className="flex items-center space-x-2 text-gray-600 hover:text-pink-600 transition-colors"
             >
-              <ArrowLeft className="h-4 w-4 mr-1" />
-              Back to Dashboard
+              <ArrowLeft className="w-5 h-5" />
+              <span>Back to Dashboard</span>
             </Link>
           </div>
-          
-          <div className="text-center mb-12 animate-fade-in-up">
-            <div className="inline-flex items-center px-4 py-2 bg-white/80 backdrop-blur-xl rounded-full shadow-lg mb-6 border border-white/20">
-              <Zap className="h-4 w-4 text-purple-500 mr-2" />
-              <span className="text-gray-700 font-medium text-sm">AI-Powered Analysis</span>
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
-              Ultrasound Detection
-            </h1>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Upload your ultrasound images for AI-powered PCOS cyst detection and analysis
-            </p>
-          </div>
         </div>
-      </section>
+      </header>
 
-      {/* Upload Section */}
-      <section className="py-8 px-4">
-        <div className="max-w-4xl mx-auto">
-          <Card className="bg-white/80 backdrop-blur-xl border border-white/20 rounded-2xl shadow-lg animate-fade-in-up">
-            <CardHeader>
-              <CardTitle className="text-2xl font-bold text-center flex items-center justify-center">
-                <Upload className="h-6 w-6 mr-2" />
-                Upload Ultrasound Image
-              </CardTitle>
-              <CardDescription className="text-center">
-                Supported formats: JPG, PNG, DICOM. Maximum file size: 10MB
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="border-2 border-dashed border-purple-300 rounded-xl p-8 text-center hover:border-purple-400 transition-colors duration-300">
-                <input
-                  type="file"
-                  accept="image/*,.dcm"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                  id="ultrasound-upload"
-                />
-                <label
-                  htmlFor="ultrasound-upload"
-                  className="cursor-pointer flex flex-col items-center space-y-4"
-                >
-                  <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center">
-                    <ImageIcon className="h-8 w-8 text-white" />
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Page Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">AI Ultrasound Detection</h1>
+          <p className="text-xl text-gray-600">Upload your ultrasound image for AI-powered PCOS detection analysis</p>
+        </div>
+
+        {/* Upload Section */}
+        {!uploadedImage && (
+          <div className="bg-white rounded-2xl p-8 shadow-xl mb-8">
+            <div className="text-center">
+              <div className="border-2 border-dashed border-gray-300 rounded-xl p-12 hover:border-pink-400 transition-colors">
+                <div className="flex flex-col items-center space-y-4">
+                  <div className="bg-gradient-to-r from-pink-100 to-purple-100 rounded-full p-6">
+                    <Upload className="w-12 h-12 text-pink-600" />
                   </div>
                   <div>
-                    <p className="text-lg font-semibold text-gray-700">
-                      Click to upload or drag and drop
-                    </p>
-                    <p className="text-gray-500">Your ultrasound image here</p>
+                    <h3 className="text-xl font-semibold text-gray-800 mb-2">Upload Ultrasound Image</h3>
+                    <p className="text-gray-600 mb-4">Drag and drop your ultrasound image here, or click to browse</p>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                      id="image-upload"
+                    />
+                    <label
+                      htmlFor="image-upload"
+                      className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-3 rounded-lg cursor-pointer hover:shadow-lg transition-all inline-flex items-center space-x-2"
+                    >
+                      <Camera className="w-5 h-5" />
+                      <span>Choose Image</span>
+                    </label>
                   </div>
-                </label>
+                  <p className="text-sm text-gray-500">Supported formats: JPG, PNG, GIF (Max size: 10MB)</p>
+                </div>
               </div>
+            </div>
+          </div>
+        )}
 
-              {uploadedFile && (
-                <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center space-x-3">
-                  <FileImage className="h-5 w-5 text-green-600" />
-                  <div className="flex-1">
-                    <p className="font-medium text-green-800">{uploadedFile.name}</p>
-                    <p className="text-sm text-green-600">
-                      {(uploadedFile.size / 1024 / 1024).toFixed(2)} MB
-                    </p>
-                  </div>
-                  <CheckCircle className="h-5 w-5 text-green-600" />
+        {/* Image Preview and Analysis */}
+        {uploadedImage && (
+          <div className="bg-white rounded-2xl p-8 shadow-xl mb-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Image Preview */}
+              <div>
+                <h3 className="text-xl font-semibold text-gray-800 mb-4 flex items-center space-x-2">
+                  <FileImage className="w-6 h-6 text-pink-600" />
+                  <span>Uploaded Image</span>
+                </h3>
+                <div className="border rounded-xl overflow-hidden">
+                  <img
+                    src={uploadedImage || "/placeholder.svg"}
+                    alt="Uploaded ultrasound"
+                    className="w-full h-64 object-cover"
+                  />
                 </div>
-              )}
-
-              {uploadedFile && !isAnalyzing && !analysisComplete && (
-                <Button
-                  onClick={handleAnalyze}
-                  className="w-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300"
-                >
-                  <Zap className="mr-2 h-4 w-4" />
-                  Analyze with AI
-                </Button>
-              )}
-
-              {isAnalyzing && (
-                <div className="space-y-4">
-                  <div className="text-center">
-                    <div className="inline-flex items-center px-4 py-2 bg-purple-50 rounded-full">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600 mr-2"></div>
-                      <span className="text-purple-700 font-medium">Analyzing image...</span>
-                    </div>
-                  </div>
-                  <Progress value={33} className="w-full" />
-                  <p className="text-center text-gray-600 text-sm">
-                    Our AI is examining your ultrasound for PCOS indicators
-                  </p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      </section>
-
-      {/* Results Section */}
-      {analysisComplete && analysisResult && (
-        <section className="py-8 px-4">
-          <div className="max-w-4xl mx-auto">
-            <Card className="bg-white/80 backdrop-blur-xl border border-white/20 rounded-2xl shadow-lg animate-fade-in-up">
-              <CardHeader>
-                <CardTitle className="text-2xl font-bold text-center flex items-center justify-center">
-                  {analysisResult.detected ? (
-                    <AlertCircle className="h-6 w-6 mr-2 text-orange-500" />
-                  ) : (
-                    <CheckCircle className="h-6 w-6 mr-2 text-green-500" />
-                  )}
-                  Analysis Results
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <Alert className={analysisResult.detected ? "border-orange-200 bg-orange-50" : "border-green-200 bg-green-50"}>
-                  <AlertDescription className={analysisResult.detected ? "text-orange-800" : "text-green-800"}>
-                    {analysisResult.detected
-                      ? `Potential PCOS indicators detected with ${analysisResult.confidence}% confidence`
-                      : `No significant PCOS indicators detected (${analysisResult.confidence}% confidence)`}
-                  </AlertDescription>
-                </Alert>
-
-                <div className="grid md:grid-cols-2 gap-6">
-                  <Card className="border border-gray-200">
-                    <CardHeader>
-                      <CardTitle className="text-lg">Confidence Level</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex items-center space-x-3">
-                        <Progress value={analysisResult.confidence} className="flex-1" />
-                        <span className="font-semibold">{analysisResult.confidence}%</span>
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="border border-gray-200">
-                    <CardHeader>
-                      <CardTitle className="text-lg">Status</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                        analysisResult.detected
-                          ? "bg-orange-100 text-orange-800"
-                          : "bg-green-100 text-green-800"
-                      }`}>
-                        {analysisResult.detected ? "Indicators Found" : "No Indicators"}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-
-                <Card className="border border-gray-200">
-                  <CardHeader>
-                    <CardTitle className="text-lg">Recommendations</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-2">
-                      {analysisResult.recommendations.map((rec, index) => (
-                        <li key={index} className="flex items-start space-x-2">
-                          <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
-                          <span className="text-gray-700">{rec}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
-
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <Link href="/dashboard/experts" className="flex-1">
-                    <Button className="w-full bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
-                      Consult with Expert
-                    </Button>
-                  </Link>
-                  <Button
-                    variant="outline"
-                    className="flex-1 border-2 border-purple-200 hover:border-purple-300 hover:bg-purple-50 transition-all duration-300 bg-transparent"
+                <div className="mt-4 flex space-x-4">
+                  <button
                     onClick={() => {
-                      setUploadedFile(null)
-                      setAnalysisComplete(false)
+                      setUploadedImage(null)
                       setAnalysisResult(null)
                     }}
+                    className="text-gray-600 hover:text-gray-800 transition-colors"
                   >
-                    Analyze Another Image
-                  </Button>
+                    Upload Different Image
+                  </button>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
-        </section>
-      )} 
               </div>
-  )}
+
+              {/* Analysis Section */}
+              <div>
+                <h3 className="text-xl font-semibold text-gray-800 mb-4">AI Analysis</h3>
+
+                {!analysisResult && !isAnalyzing && (
+                  <div className="text-center py-8">
+                    <p className="text-gray-600 mb-6">Ready to analyze your ultrasound image for PCOS indicators</p>
+                    <button
+                      onClick={analyzeImage}
+                      className="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-8 py-3 rounded-lg hover:shadow-lg transition-all"
+                    >
+                      Start Analysis
+                    </button>
+                  </div>
+                )}
+
+                {isAnalyzing && (
+                  <div className="text-center py-8">
+                    <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-pink-600 mx-auto mb-4"></div>
+                    <p className="text-gray-600">Analyzing image...</p>
+                    <p className="text-sm text-gray-500 mt-2">This may take a few moments</p>
+                  </div>
+                )}
+
+                {analysisResult && (
+                  <div className="space-y-6">
+                    <div
+                      className={`p-4 rounded-lg ${
+                        analysisResult.detected
+                          ? "bg-yellow-50 border border-yellow-200"
+                          : "bg-green-50 border border-green-200"
+                      }`}
+                    >
+                      <div className="flex items-center space-x-3 mb-2">
+                        {analysisResult.detected ? (
+                          <AlertCircle className="w-6 h-6 text-yellow-600" />
+                        ) : (
+                          <CheckCircle className="w-6 h-6 text-green-600" />
+                        )}
+                        <h4
+                          className={`font-semibold ${analysisResult.detected ? "text-yellow-800" : "text-green-800"}`}
+                        >
+                          {analysisResult.detected ? "PCOS Indicators Detected" : "No Clear PCOS Indicators"}
+                        </h4>
+                      </div>
+                      <p className={`text-sm ${analysisResult.detected ? "text-yellow-700" : "text-green-700"}`}>
+                        Confidence: {analysisResult.confidence}%
+                      </p>
+                    </div>
+
+                    <div>
+                      <h4 className="font-semibold text-gray-800 mb-3">Recommendations:</h4>
+                      <ul className="space-y-2">
+                        {analysisResult.recommendations.map((rec, index) => (
+                          <li key={index} className="flex items-start space-x-2">
+                            <div className="w-2 h-2 bg-pink-500 rounded-full mt-2"></div>
+                            <span className="text-gray-700">{rec}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div className="bg-blue-50 border border-blue-200 p-4 rounded-lg">
+                      <p className="text-blue-800 text-sm">
+                        <strong>Important:</strong> This AI analysis is for informational purposes only and should not
+                        replace professional medical diagnosis. Please consult with a healthcare provider for proper
+                        evaluation.
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Information Section */}
+        <div className="bg-white rounded-2xl p-8 shadow-xl">
+          <h2 className="text-2xl font-semibold text-gray-800 mb-6">About Ultrasound Detection</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-3">How It Works</h3>
+              <ul className="space-y-2 text-gray-600">
+                <li>• AI analyzes ultrasound images for PCOS markers</li>
+                <li>• Detects polycystic ovary patterns</li>
+                <li>• Provides confidence scores and recommendations</li>
+                <li>• Helps identify when to seek medical consultation</li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-3">Best Practices</h3>
+              <ul className="space-y-2 text-gray-600">
+                <li>• Use clear, high-quality ultrasound images</li>
+                <li>• Ensure proper lighting and contrast</li>
+                <li>• Include relevant anatomical markers</li>
+                <li>• Always follow up with healthcare providers</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
