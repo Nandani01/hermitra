@@ -1,10 +1,9 @@
-"use client"
+"use client";
 
-import type React from "react"
-
-import { useState } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
+import React, { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import $axios from "@/lib/axios.instance";
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
@@ -14,71 +13,132 @@ export default function SignUp() {
     password: "",
     confirmPassword: "",
     age: "",
-    phone: "",
-  })
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState("")
-  const [step, setStep] = useState(1) // 1: form, 2: OTP verification
-  const router = useRouter()
+    phoneNumber: "",
+  });
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [step, setStep] = useState(1);
+  const router = useRouter();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
-    })
-  }
+    });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setError("")
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
 
-    // Validate form
     if (formData.password !== formData.confirmPassword) {
-      setError("Passwords do not match")
-      setIsLoading(false)
-      return
+      setError("Passwords do not match");
+      setIsLoading(false);
+      return;
     }
 
     if (formData.password.length < 6) {
-      setError("Password must be at least 6 characters")
-      setIsLoading(false)
-      return
+      setError("Password must be at least 6 characters");
+      setIsLoading(false);
+      return;
     }
 
-    // Simulate API call to send OTP
-    setTimeout(() => {
-      setStep(2)
-      setIsLoading(false)
-    }, 1000)
-  }
+    try {
+      const response = await $axios.post("/auth/register", {
+        firstname: formData.firstName,
+        lastname: formData.lastName,
+        email: formData.email,
+        password: formData.password,
+        phoneNumber: formData.phoneNumber,
+        age: Number(formData.age),
+      });
 
-  const handleOTPVerification = async (otp: string) => {
-    setIsLoading(true)
+      localStorage.setItem("email", formData.email);
 
-    // Simulate OTP verification
-    setTimeout(() => {
-      if (otp === "123456") {
-        // Mock OTP
-        router.push("/dashboard")
+      if (response.status === 200 || response.status === 201) {
+        console.log(response);
+        setStep(2);
       } else {
-        setError("Invalid OTP. Please try again.")
+        setError("Something went wrong. Please try again.");
       }
-      setIsLoading(false)
-    }, 1000)
+    } catch (err: any) {
+      if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else {
+        setError("An error occurred. Please try again.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+const handleOTPVerification = async (otp: string) => {
+  setIsLoading(true);
+  setError("");
+
+  const email = localStorage.getItem("email");
+
+  if (!email) {
+    setError("Email not found. Please register again.");
+    setIsLoading(false);
+    return;
   }
+
+  if (!otp || otp.length !== 6) {
+    setError("Please enter a valid 6-digit OTP.");
+    setIsLoading(false);
+    return;
+  }
+
+  console.log("🚀 VERIFY OTP PAYLOAD:", {
+    otp,
+    email,
+    purpose: "emailVerification",
+  });
+
+  try {
+    const response = await $axios.post("/auth/verifyOtp", {
+      otp,
+      email,
+      purpose: "emailVerification",
+    });
+
+    if (response.status === 200) {
+      router.push("/signin");
+    } else {
+      setError("Invalid OTP. Please try again.");
+    }
+  } catch (err: any) {
+    setError(
+      err.response?.data?.message ||
+        "OTP verification failed. Please try again."
+    );
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   if (step === 2) {
     return (
-      <OTPVerification email={formData.email} onVerify={handleOTPVerification} isLoading={isLoading} error={error} />
-    )
+      <OTPVerification
+        email={formData.email}
+        onVerify={handleOTPVerification}
+        isLoading={isLoading}
+        error={error}
+      />
+    );
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <Link href="/" className="inline-flex items-center space-x-3 hover:opacity-80 transition-opacity">
+          <Link
+            href="/"
+            className="inline-flex items-center space-x-3 hover:opacity-80 transition-opacity"
+          >
             <div className="w-12 h-12 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full flex items-center justify-center">
               <span className="text-white font-bold text-xl">H</span>
             </div>
@@ -86,19 +146,28 @@ export default function SignUp() {
               Hermitra
             </span>
           </Link>
-          <h2 className="mt-6 text-3xl font-bold text-gray-900">Create your account</h2>
-          <p className="mt-2 text-sm text-gray-600">Join our community and start your PCOS wellness journey</p>
+          <h2 className="mt-6 text-3xl font-bold text-gray-900">
+            Create your account
+          </h2>
+          <p className="mt-2 text-sm text-gray-600">
+            Join our community and start your PCOS wellness journey
+          </p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-xl p-8">
           <form className="space-y-6" onSubmit={handleSubmit}>
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">{error}</div>
+              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
+                {error}
+              </div>
             )}
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2">
+                <label
+                  htmlFor="firstName"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
                   First Name
                 </label>
                 <input
@@ -113,7 +182,10 @@ export default function SignUp() {
                 />
               </div>
               <div>
-                <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-2">
+                <label
+                  htmlFor="lastName"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
                   Last Name
                 </label>
                 <input
@@ -130,7 +202,10 @@ export default function SignUp() {
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Email address
               </label>
               <input
@@ -146,15 +221,18 @@ export default function SignUp() {
             </div>
 
             <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="phoneNumber"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Phone Number
               </label>
               <input
-                id="phone"
-                name="phone"
+                id="phoneNumber"
+                name="phoneNumber"
                 type="tel"
                 required
-                value={formData.phone}
+                value={formData.phoneNumber}
                 onChange={handleInputChange}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
                 placeholder="Enter your phone number"
@@ -162,7 +240,10 @@ export default function SignUp() {
             </div>
 
             <div>
-              <label htmlFor="age" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="age"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Age
               </label>
               <input
@@ -180,7 +261,10 @@ export default function SignUp() {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Password
               </label>
               <input
@@ -196,7 +280,10 @@ export default function SignUp() {
             </div>
 
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="confirmPassword"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Confirm Password
               </label>
               <input
@@ -219,13 +306,22 @@ export default function SignUp() {
                 required
                 className="h-4 w-4 text-pink-600 focus:ring-pink-500 border-gray-300 rounded"
               />
-              <label htmlFor="terms" className="ml-2 block text-sm text-gray-700">
+              <label
+                htmlFor="terms"
+                className="ml-2 block text-sm text-gray-700"
+              >
                 I agree to the{" "}
-                <Link href="/terms" className="text-pink-600 hover:text-pink-500">
+                <Link
+                  href="/terms"
+                  className="text-pink-600 hover:text-pink-500"
+                >
                   Terms of Service
                 </Link>{" "}
                 and{" "}
-                <Link href="/privacy" className="text-pink-600 hover:text-pink-500">
+                <Link
+                  href="/privacy"
+                  className="text-pink-600 hover:text-pink-500"
+                >
                   Privacy Policy
                 </Link>
               </label>
@@ -243,7 +339,10 @@ export default function SignUp() {
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
               Already have an account?{" "}
-              <Link href="/signin" className="text-pink-600 hover:text-pink-500 font-medium">
+              <Link
+                href="/signin"
+                className="text-pink-600 hover:text-pink-500 font-medium"
+              >
                 Sign in here
               </Link>
             </p>
@@ -251,7 +350,7 @@ export default function SignUp() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 function OTPVerification({
@@ -260,41 +359,42 @@ function OTPVerification({
   isLoading,
   error,
 }: {
-  email: string
-  onVerify: (otp: string) => void
-  isLoading: boolean
-  error: string
+  email: string;
+  onVerify: (otp: string) => void;
+  isLoading: boolean;
+  error: string;
 }) {
-  const [otp, setOtp] = useState(["", "", "", "", "", ""])
-  const [resendTimer, setResendTimer] = useState(60)
+  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
 
   const handleOtpChange = (index: number, value: string) => {
     if (value.length <= 1) {
-      const newOtp = [...otp]
-      newOtp[index] = value
-      setOtp(newOtp)
+      const newOtp = [...otp];
+      newOtp[index] = value;
+      setOtp(newOtp);
 
-      // Auto-focus next input
       if (value && index < 5) {
-        const nextInput = document.getElementById(`otp-${index + 1}`)
-        nextInput?.focus()
+        const nextInput = document.getElementById(`otp-${index + 1}`);
+        nextInput?.focus();
       }
     }
-  }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    const otpString = otp.join("")
+    e.preventDefault();
+    const otpString = otp.join("");
     if (otpString.length === 6) {
-      onVerify(otpString)
+      onVerify(otpString);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <Link href="/" className="inline-flex items-center space-x-3 hover:opacity-80 transition-opacity">
+          <Link
+            href="/"
+            className="inline-flex items-center space-x-3 hover:opacity-80 transition-opacity"
+          >
             <div className="w-12 h-12 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full flex items-center justify-center">
               <span className="text-white font-bold text-xl">H</span>
             </div>
@@ -302,16 +402,21 @@ function OTPVerification({
               Hermitra
             </span>
           </Link>
-          <h2 className="mt-6 text-3xl font-bold text-gray-900">Verify your email</h2>
+          <h2 className="mt-6 text-3xl font-bold text-gray-900">
+            Verify your email
+          </h2>
           <p className="mt-2 text-sm text-gray-600">
-            We've sent a 6-digit code to <span className="font-medium">{email}</span>
+            We've sent a 6-digit code to{" "}
+            <span className="font-medium">{email}</span>
           </p>
         </div>
 
         <div className="bg-white rounded-2xl shadow-xl p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">{error}</div>
+              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg text-sm">
+                {error}
+              </div>
             )}
 
             <div className="flex justify-center space-x-3">
@@ -322,7 +427,9 @@ function OTPVerification({
                   type="text"
                   maxLength={1}
                   value={digit}
-                  onChange={(e) => handleOtpChange(index, e.target.value)}
+                  onChange={(e) =>
+                    handleOtpChange(index, e.target.value)
+                  }
                   className="w-12 h-12 text-center text-xl font-bold border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent transition-all"
                 />
               ))}
@@ -336,15 +443,8 @@ function OTPVerification({
               {isLoading ? "Verifying..." : "Verify OTP"}
             </button>
           </form>
-
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
-              Didn't receive the code?{" "}
-              <button className="text-pink-600 hover:text-pink-500 font-medium">Resend code</button>
-            </p>
-          </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
