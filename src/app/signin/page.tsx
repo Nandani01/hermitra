@@ -5,6 +5,7 @@ import type React from "react"
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import $axios from "@/lib/axios.instance"
 
 export default function SignIn() {
   const [email, setEmail] = useState("")
@@ -13,21 +14,44 @@ export default function SignIn() {
   const [error, setError] = useState("")
   const router = useRouter()
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setError("")
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setIsLoading(true);
+  setError("");
 
-    // Simulate API call
-    setTimeout(() => {
-      if (email && password) {
-        router.push("/dashboard")
-      } else {
-        setError("Please fill in all fields")
-      }
-      setIsLoading(false)
-    }, 1000)
+  try {
+    const { data } = await $axios.post("/auth/login", {
+      email,
+      password,
+    });
+
+    console.log(data);
+
+    // Redirect on success
+    window.location.href = "/dashboard";
+
+    // router.push("/dashboard");
+        // router.refresh();
+
+    return;
+  } catch (err: unknown) {
+    let message = "An error occurred during login";
+
+    if (
+      err &&
+      typeof err === "object" &&
+      "response" in err &&
+      (err as any).response?.data?.message
+    ) {
+      message = (err as any).response.data.message;
+    }
+
+    setError(message);
+  } finally {
+    setIsLoading(false);
   }
+};
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">

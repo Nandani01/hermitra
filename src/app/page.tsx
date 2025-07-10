@@ -66,7 +66,7 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all group">
-              <div className="bg-gradient-to-r from-pink-100 to-purple-100 rounded-xl p-4 mb-4 group-hover:scale-110 transition-transform">
+              <div className="bg-gradient-to-r w-16 from-pink-100 to-purple-100 rounded-xl p-4 mb-4 group-hover:scale-110 transition-transform">
                 <Stethoscope className="w-8 h-8 text-pink-600" />
               </div>
               <h3 className="text-xl font-semibold text-gray-800 mb-2">Health Assessment</h3>
@@ -74,7 +74,7 @@ export default function Home() {
             </div>
 
             <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all group">
-              <div className="bg-gradient-to-r from-purple-100 to-indigo-100 rounded-xl p-4 mb-4 group-hover:scale-110 transition-transform">
+              <div className="bg-gradient-to-r w-16 from-purple-100 to-indigo-100 rounded-xl p-4 mb-4 group-hover:scale-110 transition-transform">
                 <Calendar className="w-8 h-8 text-purple-600" />
               </div>
               <h3 className="text-xl font-semibold text-gray-800 mb-2">Period Tracking</h3>
@@ -84,7 +84,7 @@ export default function Home() {
             </div>
 
             <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all group">
-              <div className="bg-gradient-to-r from-indigo-100 to-pink-100 rounded-xl p-4 mb-4 group-hover:scale-110 transition-transform">
+              <div className="bg-gradient-to-r w-16 from-indigo-100 to-pink-100 rounded-xl p-4 mb-4 group-hover:scale-110 transition-transform">
                 <Music className="w-8 h-8 text-indigo-600" />
               </div>
               <h3 className="text-xl font-semibold text-gray-800 mb-2">Wellness & Exercise</h3>
@@ -92,7 +92,7 @@ export default function Home() {
             </div>
 
             <div className="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all group">
-              <div className="bg-gradient-to-r from-green-100 to-blue-100 rounded-xl p-4 mb-4 group-hover:scale-110 transition-transform">
+              <div className="bg-gradient-to-r w-16 from-green-100 to-blue-100 rounded-xl p-4 mb-4 group-hover:scale-110 transition-transform">
                 <Apple className="w-8 h-8 text-green-600" />
               </div>
               <h3 className="text-xl font-semibold text-gray-800 mb-2">Nutrition Guide</h3>
