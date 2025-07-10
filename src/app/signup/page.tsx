@@ -132,21 +132,16 @@ const handleOTPVerification = async (otp: string) => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8"
+     style={{
+        backgroundImage: `url('/photos/login.png')`,
+        backgroundRepeat: "no-repeat",
+        backgroundSize: "contain",
+      }}>
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <Link
-            href="/"
-            className="inline-flex items-center space-x-3 hover:opacity-80 transition-opacity"
-          >
-            <div className="w-12 h-12 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-xl">H</span>
-            </div>
-            <span className="text-3xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
-              Hermitra
-            </span>
-          </Link>
-          <h2 className="mt-6 text-3xl font-bold text-gray-900">
+          
+          <h2 className="mt-0 text-3xl font-bold text-gray-900">
             Create your account
           </h2>
           <p className="mt-2 text-sm text-gray-600">

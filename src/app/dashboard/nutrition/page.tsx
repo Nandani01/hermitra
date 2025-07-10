@@ -1,728 +1,667 @@
 "use client"
 
 import { useState } from "react"
-import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
-  Heart,
-  ArrowLeft,
-  Apple,
-  CheckCircle,
-  XCircle,
-  Search,
-  Star,
+  Utensils,
   Clock,
-  Users,
-  ChefHat,
+  Star,
+  Heart,
   Leaf,
   Zap,
-  Shield,
-  AlertTriangle,
+  Search,
+  BookOpen,
+  ChefHat,
+  Apple,
+  Droplets,
+  CheckCircle,
+  XCircle,
 } from "lucide-react"
-
-interface Food {
-  id: number
-  name: string
-  category: string
-  type: "beneficial" | "avoid" | "moderate"
-  benefits?: string[]
-  concerns?: string[]
-  glycemicIndex: "low" | "medium" | "high"
-  antiInflammatory: boolean
-  image: string
-}
-
-interface MealPlan {
-  id: number
-  name: string
-  description: string
-  duration: string
-  difficulty: "Easy" | "Medium" | "Hard"
-  meals: {
-    breakfast: string[]
-    lunch: string[]
-    dinner: string[]
-    snacks: string[]
-  }
-  benefits: string[]
-  image: string
-}
-
-const foods: Food[] = [
-  {
-    id: 1,
-    name: "Leafy Greens",
-    category: "Vegetables",
-    type: "beneficial",
-    benefits: ["High in folate", "Anti-inflammatory", "Low glycemic index"],
-    glycemicIndex: "low",
-    antiInflammatory: true,
-    image: "/placeholder.svg?height=100&width=100",
-  },
-  {
-    id: 2,
-    name: "Fatty Fish",
-    category: "Protein",
-    type: "beneficial",
-    benefits: ["Omega-3 fatty acids", "Reduces inflammation", "Supports hormone balance"],
-    glycemicIndex: "low",
-    antiInflammatory: true,
-    image: "/placeholder.svg?height=100&width=100",
-  },
-  {
-    id: 3,
-    name: "Berries",
-    category: "Fruits",
-    type: "beneficial",
-    benefits: ["Antioxidants", "Low sugar", "Anti-inflammatory"],
-    glycemicIndex: "low",
-    antiInflammatory: true,
-    image: "/placeholder.svg?height=100&width=100",
-  },
-  {
-    id: 4,
-    name: "Refined Sugar",
-    category: "Sweeteners",
-    type: "avoid",
-    concerns: ["Spikes blood sugar", "Increases inflammation", "Worsens insulin resistance"],
-    glycemicIndex: "high",
-    antiInflammatory: false,
-    image: "/placeholder.svg?height=100&width=100",
-  },
-  {
-    id: 5,
-    name: "White Bread",
-    category: "Grains",
-    type: "avoid",
-    concerns: ["High glycemic index", "Low fiber", "Blood sugar spikes"],
-    glycemicIndex: "high",
-    antiInflammatory: false,
-    image: "/placeholder.svg?height=100&width=100",
-  },
-  {
-    id: 6,
-    name: "Quinoa",
-    category: "Grains",
-    type: "beneficial",
-    benefits: ["Complete protein", "High fiber", "Low glycemic index"],
-    glycemicIndex: "low",
-    antiInflammatory: true,
-    image: "/placeholder.svg?height=100&width=100",
-  },
-  {
-    id: 7,
-    name: "Nuts & Seeds",
-    category: "Healthy Fats",
-    type: "beneficial",
-    benefits: ["Healthy fats", "Protein", "Magnesium"],
-    glycemicIndex: "low",
-    antiInflammatory: true,
-    image: "/placeholder.svg?height=100&width=100",
-  },
-  {
-    id: 8,
-    name: "Processed Foods",
-    category: "Processed",
-    type: "avoid",
-    concerns: ["High sodium", "Preservatives", "Trans fats"],
-    glycemicIndex: "high",
-    antiInflammatory: false,
-    image: "/placeholder.svg?height=100&width=100",
-  },
-]
-
-const mealPlans: MealPlan[] = [
-  {
-    id: 1,
-    name: "Anti-Inflammatory PCOS Plan",
-    description: "7-day meal plan focused on reducing inflammation and balancing hormones",
-    duration: "7 days",
-    difficulty: "Easy",
-    meals: {
-      breakfast: ["Greek yogurt with berries", "Spinach and mushroom omelet", "Chia seed pudding"],
-      lunch: ["Quinoa salad with vegetables", "Grilled salmon with sweet potato", "Lentil soup"],
-      dinner: ["Baked chicken with roasted vegetables", "Zucchini noodles with pesto", "Stuffed bell peppers"],
-      snacks: ["Mixed nuts", "Apple with almond butter", "Hummus with vegetables"],
-    },
-    benefits: ["Reduces inflammation", "Stabilizes blood sugar", "Supports weight management"],
-    image: "/placeholder.svg?height=200&width=300",
-  },
-  {
-    id: 2,
-    name: "Low-Carb PCOS Plan",
-    description: "Ketogenic-style meal plan to improve insulin sensitivity",
-    duration: "14 days",
-    difficulty: "Medium",
-    meals: {
-      breakfast: ["Avocado and eggs", "Keto smoothie", "Coconut flour pancakes"],
-      lunch: ["Cauliflower rice bowl", "Zucchini lasagna", "Chicken Caesar salad"],
-      dinner: ["Grilled steak with asparagus", "Baked cod with broccoli", "Pork chops with green beans"],
-      snacks: ["Cheese and olives", "Macadamia nuts", "Celery with cream cheese"],
-    },
-    benefits: ["Improves insulin sensitivity", "Promotes weight loss", "Reduces cravings"],
-    image: "/placeholder.svg?height=200&width=300",
-  },
-  {
-    id: 3,
-    name: "Mediterranean PCOS Plan",
-    description: "Heart-healthy Mediterranean diet adapted for PCOS management",
-    duration: "21 days",
-    difficulty: "Easy",
-    meals: {
-      breakfast: ["Greek yogurt with nuts", "Whole grain toast with avocado", "Fruit and nut bowl"],
-      lunch: ["Mediterranean quinoa bowl", "Greek salad with chickpeas", "Vegetable soup"],
-      dinner: ["Grilled fish with vegetables", "Chicken with olive tapenade", "Vegetarian pasta"],
-      snacks: ["Olives and cheese", "Fresh fruit", "Whole grain crackers"],
-    },
-    benefits: ["Heart healthy", "Anti-inflammatory", "Sustainable long-term"],
-    image: "/placeholder.svg?height=200&width=300",
-  },
-]
 
 export default function NutritionPage() {
   const [searchTerm, setSearchTerm] = useState("")
-  const [selectedCategory, setSelectedCategory] = useState("all")
-  const [selectedMealPlan, setSelectedMealPlan] = useState<MealPlan | null>(null)
-
-  const categories = ["all", "Vegetables", "Fruits", "Protein", "Grains", "Healthy Fats", "Processed"]
-
-  const filteredFoods = foods.filter((food) => {
-    const matchesSearch = food.name.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesCategory = selectedCategory === "all" || food.category === selectedCategory
-    return matchesSearch && matchesCategory
+  const [favoriteRecipes, setFavoriteRecipes] = useState<string[]>([])
+  const [dailyIntake, setDailyIntake] = useState({
+    calories: 1250,
+    protein: 65,
+    carbs: 120,
+    fiber: 18,
+    water: 6,
   })
 
-  const beneficialFoods = filteredFoods.filter((food) => food.type === "beneficial")
-  const avoidFoods = filteredFoods.filter((food) => food.type === "avoid")
+  const recipes = [
+    {
+      id: "dal-bhat-tarkari",
+      title: "Dal Bhat Tarkari",
+      category: "Traditional Nepali",
+      time: "45 min",
+      difficulty: "Medium",
+      calories: 380,
+      servings: 2,
+      rating: 4.9,
+      image: "/photos/thakali.jpg",
+      ingredients: ["Brown rice", "Masoor dal", "Spinach", "Cauliflower", "Turmeric"],
+      benefits: ["High protein", "Low GI", "Anti-inflammatory"],
+      description: "Traditional Nepali meal adapted for PCOS with brown rice and nutrient-rich vegetables.",
+      // nutrition: {
+      //   protein: "18g",
+      //   carbs: "45g",
+      //   fiber: "12g",
+      //   iron: "4.2mg",
+      //   folate: "85mcg",
+      // },
+    },
+    {
+      id: "gundruk-soup",
+      title: "Gundruk Soup ",
+      category: "Traditional Nepali",
+      time: "30 min",
+      difficulty: "Easy",
+      calories: 220,
+      servings: 2,
+      rating: 4.7,
+      image: "/photos/gundrukjhol.jpg",
+      ingredients: ["Gundruk", "Tomatoes", "Ginger", "Garlic"],
+      benefits: ["Probiotic", "High fiber", "Vitamin C"],
+      description: "Fermented leafy greens soup rich in probiotics and nutrients, perfect for gut health.",
+      // nutrition: {
+      //   protein: "12g",
+      //   carbs: "28g",
+      //   fiber: "8g",
+      //   vitamin_c: "45mg",
+      //   probiotics: "High",
+      // },
+    },
+    {
+      id: "buckwheat-dhido",
+      title: "Kodo Dhido with Vegetables",
+      category: "Traditional Nepali",
+      time: "25 min",
+      difficulty: "Easy",
+      calories: 290,
+      servings: 1,
+      rating: 4.6,
+      image: "/photos/dhido.jpg",
+      ingredients: ["Buckwheat flour", "Spinach", "Radish leaves", "Sesame seeds"],
+      benefits: ["Gluten-free", "Low GI", "High magnesium"],
+      description: "Traditional Nepali porridge made with nutrient-dense buckwheat flour.",
+      // nutrition: {
+      //   protein: "11g",
+      //   carbs: "35g",
+      //   fiber: "9g",
+      //   magnesium: "180mg",
+      //   manganese: "2.1mg",
+      // },
+    },
+    {
+      id: "millet-roti",
+      title: "Kodo Roti with Butter",
+      category: "Traditional Nepali",
+      time: "20 min",
+      difficulty: "Easy",
+      calories: 320,
+      servings: 2,
+      rating: 4.5,
+      image: "/photos/milletroti.jpg",
+      ingredients: ["Kodo millet flour", "Ghee", "Fenugreek leaves", "Cumin seeds"],
+      benefits: ["Low GI", "High protein", "Hormone balancing"],
+      description: "Nutritious flatbread made from ancient millet grains, excellent for PCOS management.",
+      // nutrition: {
+      //   protein: "14g",
+      //   carbs: "38g",
+      //   fiber: "7g",
+      //   iron: "3.8mg",
+      //   zinc: "2.4mg",
+      // },
+    },
+    {
+      id: "saag-chicken",
+      title: "Nepali Saag with Chicken",
+      category: "Traditional Nepali",
+      time: "40 min",
+      difficulty: "Medium",
+      calories: 420,
+      servings: 2,
+      rating: 4.8,
+      image: "/photos/saagchicken.jpg",
+      ingredients: ["Chicken breast", "Mustard greens", "Spinach", "Ginger", "Garlic"],
+      benefits: ["High protein", "Iron rich", "Anti-inflammatory"],
+      description: "Traditional leafy greens curry with lean protein, packed with nutrients.",
+      // nutrition: {
+      //   protein: "32g",
+      //   carbs: "15g",
+      //   fiber: "6g",
+      //   iron: "5.2mg",
+      //   vitamin_k: "180mcg",
+      // },
+    },
+    {
+      id: "chiura-mix",
+      title: "Nutritious Chiura Bowl",
+      category: "Traditional Nepali",
+      time: "10 min",
+      difficulty: "Easy",
+      calories: 280,
+      servings: 1,
+      rating: 4.4,
+      image: "/photos/chiurawebp.webp",
+      ingredients: ["Beaten rice", "Yogurt", "Cucumber", "Mint", "Roasted peanuts"],
+      benefits: ["Probiotic", "Quick energy", "Digestive health"],
+      description: "Light and nutritious beaten rice bowl with probiotics and healthy fats.",
+      // nutrition: {
+      //   protein: "9g",
+      //   carbs: "42g",
+      //   fiber: "4g",
+      //   calcium: "120mg",
+      //   healthy_fats: "8g",
+      // },
+    },
+    {
+      id: "lapsi-porridge",
+      title: "Lapsi with Nuts",
+      category: "Traditional Nepali",
+      time: "35 min",
+      difficulty: "Medium",
+      calories: 350,
+      servings: 2,
+      rating: 4.6,
+      image: "/photos/lapsi.jpg",
+      ingredients: ["Lapsi (broken wheat)", "Almonds", "Walnuts", "Cardamom", "Ghee"],
+      benefits: ["High fiber", "Sustained energy", "Heart healthy"],
+      description: "Traditional broken wheat porridge enriched with nuts and aromatic spices.",
+      // nutrition: {
+      //   protein: "13g",
+      //   carbs: "48g",
+      //   fiber: "11g",
+      //   vitamin_e: "6mg",
+      //   omega_3: "1.2g",
+      // },
+    },
+    {
+      id: "nettle-curry",
+      title: "Sisnu (Nettle) Curry",
+      category: "Traditional Nepali",
+      time: "25 min",
+      difficulty: "Easy",
+      calories: 180,
+      servings: 2,
+      rating: 4.7,
+      image: "/photos/sisnu.webp",
+      ingredients: ["Fresh nettle", "Onions", "Tomatoes", "Turmeric", "Mustard oil"],
+      benefits: ["Detoxifying", "Anti-inflammatory", "Hormone balancing"],
+      description: "Wild nettle curry rich in minerals and natural detoxifying compounds.",
+      // nutrition: {
+      //   protein: "8g",
+      //   carbs: "12g",
+      //   fiber: "7g",
+      //   iron: "6.1mg",
+      //   potassium: "334mg",
+      // },
+    },
+  ]
 
-  if (selectedMealPlan) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 via-teal-50 to-cyan-50">
-        {/* Navigation */}
-        <nav className="bg-white/90 backdrop-blur-lg shadow-lg border-b sticky top-0 z-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center h-16">
-              <div className="flex items-center">
-                <div className="relative">
-                  <Heart className="h-8 w-8 text-green-600 animate-pulse" />
-                  <Apple className="h-4 w-4 text-emerald-500 absolute -top-1 -right-1 animate-bounce" />
-                </div>
-                <span className="ml-2 text-xl font-bold bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 bg-clip-text text-transparent">
-                  Hermitra Nutrition
-                </span>
-              </div>
-              <Button
-                variant="outline"
-                onClick={() => setSelectedMealPlan(null)}
-                className="hover:bg-green-50 transition-all duration-300"
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Nutrition
-              </Button>
-            </div>
-          </div>
-        </nav>
+  const mealPlans = [
+    {
+      day: "Monday",
+      breakfast: "Nutritious Chiura Bowl",
+      lunch: "PCOS-Friendly Dal Bhat Tarkari",
+      dinner: "Gundruk Soup with Quinoa",
+      snack: "Roasted soybeans (bhatmas)",
+    },
+    {
+      day: "Tuesday",
+      breakfast: "Lapsi Porridge with Nuts",
+      lunch: "Buckwheat Dhido with Vegetables",
+      dinner: "Nepali Saag with Lean Chicken",
+      snack: "Cucumber with mint chutney",
+    },
+    {
+      day: "Wednesday",
+      breakfast: "Kodo Millet Roti with Ghee",
+      lunch: "Sisnu (Nettle) Curry with brown rice",
+      dinner: "Mixed dal with steamed vegetables",
+      snack: "Roasted pumpkin seeds",
+    },
+  ]
 
-        <div className="max-w-6xl mx-auto px-4 py-8">
-          {/* Meal Plan Header */}
-          <div className="text-center mb-8 animate-fade-in-up">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mb-4">
-              {selectedMealPlan.name}
-            </h1>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">{selectedMealPlan.description}</p>
-            <div className="flex justify-center space-x-4 mt-4">
-              <Badge className="bg-green-500">{selectedMealPlan.duration}</Badge>
-              <Badge variant="outline">{selectedMealPlan.difficulty}</Badge>
-            </div>
-          </div>
+  const nepaliSuperfoods = [
+    {
+      name: "Gundruk",
+      category: "Fermented Greens",
+      benefits: ["Probiotics", "Vitamin C", "Digestive health"],
+      nutrition: "Per 100g: Protein 4.2g, Fiber 8.1g, Vitamin C 45mg, Iron 2.8mg",
+      pcosSupport: "Supports gut health and hormone balance through probiotics",
+    },
+    {
+      name: "Buckwheat (Fapar)",
+      category: "Ancient Grain",
+      benefits: ["Gluten-free", "Low GI", "Magnesium rich"],
+      nutrition: "Per 100g: Protein 13.2g, Fiber 10g, Magnesium 231mg, Manganese 1.3mg",
+      pcosSupport: "Helps regulate blood sugar and supports insulin sensitivity",
+    },
+    {
+      name: "Kodo Millet",
+      category: "Ancient Grain",
+      benefits: ["Low GI", "High protein", "Iron rich"],
+      nutrition: "Per 100g: Protein 8.3g, Fiber 9g, Iron 0.5mg, Zinc 1.4mg",
+      pcosSupport: "Excellent for weight management and blood sugar control",
+    },
+    {
+      name: "Sisnu (Nettle)",
+      category: "Wild Green",
+      benefits: ["Detoxifying", "Iron rich", "Anti-inflammatory"],
+      nutrition: "Per 100g: Protein 2.7g, Iron 1.6mg, Potassium 334mg, Vitamin K 498mcg",
+      pcosSupport: "Natural detoxifier that supports liver function and hormone metabolism",
+    },
+    {
+      name: "Lapsi (Broken Wheat)",
+      category: "Whole Grain",
+      benefits: ["High fiber", "B vitamins", "Sustained energy"],
+      nutrition: "Per 100g: Protein 12.1g, Fiber 12.5g, B1 0.4mg, B3 4.3mg",
+      pcosSupport: "Provides sustained energy and supports metabolic health",
+    },
+    {
+      name: "Bhatmas (Black Soybean)",
+      category: "Legume",
+      benefits: ["Complete protein", "Isoflavones", "Heart healthy"],
+      nutrition: "Per 100g: Protein 36g, Fiber 9.3g, Folate 375mcg, Magnesium 280mg",
+      pcosSupport: "Isoflavones help balance hormones naturally",
+    },
+  ]
 
-          {/* Benefits */}
-          <Card className="mb-8 bg-gradient-to-r from-green-100 to-emerald-100 border-green-200">
-            <CardContent className="p-6">
-              <h3 className="text-lg font-bold mb-4 text-green-700">Plan Benefits</h3>
-              <div className="grid md:grid-cols-3 gap-4">
-                {selectedMealPlan.benefits.map((benefit, index) => (
-                  <div key={index} className="flex items-center">
-                    <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
-                    <span className="text-sm">{benefit}</span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+  const nutritionTips = [
+    {
+      title: "Include Traditional Fermented Foods",
+      description: "Gundruk, kinema, and other fermented foods support gut health",
+      icon: <Apple className="h-5 w-5" />,
+    },
+    {
+      title: "Choose Ancient Grains",
+      description: "Buckwheat, millet, and lapsi have lower glycemic index",
+      icon: <Leaf className="h-5 w-5" />,
+    },
+    {
+      title: "Use Local Seasonal Vegetables",
+      description: "Sisnu, palungo, and other local greens are nutrient powerhouses",
+      icon: <Droplets className="h-5 w-5" />,
+    },
+    {
+      title: "Cook with Traditional Spices",
+      description: "Turmeric, fenugreek, and cumin have anti-inflammatory properties",
+      icon: <Zap className="h-5 w-5" />,
+    },
+  ]
 
-          {/* Daily Meals */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {Object.entries(selectedMealPlan.meals).map(([mealType, meals], index) => (
-              <Card
-                key={mealType}
-                className={`animate-fade-in-up animation-delay-${index * 100} hover:shadow-xl transition-all duration-300`}
-              >
-                <CardHeader>
-                  <CardTitle className="capitalize text-lg flex items-center">
-                    {mealType === "breakfast" && <Clock className="h-5 w-5 mr-2 text-orange-500" />}
-                    {mealType === "lunch" && <ChefHat className="h-5 w-5 mr-2 text-blue-500" />}
-                    {mealType === "dinner" && <Star className="h-5 w-5 mr-2 text-purple-500" />}
-                    {mealType === "snacks" && <Apple className="h-5 w-5 mr-2 text-green-500" />}
-                    {mealType}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2">
-                    {meals.map((meal, mealIndex) => (
-                      <li key={mealIndex} className="flex items-start">
-                        <div className="w-2 h-2 bg-green-500 rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                        <span className="text-sm text-gray-700">{meal}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+  const filteredRecipes = recipes.filter(
+    (recipe) =>
+      recipe.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      recipe.category.toLowerCase().includes(searchTerm.toLowerCase()),
+  )
 
-          {/* Shopping List */}
-          <Card className="mt-8 animate-fade-in-up animation-delay-400">
-            <CardHeader>
-              <CardTitle>Shopping List Generator</CardTitle>
-              <CardDescription>Get a personalized shopping list for this meal plan</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center">
-                <Button className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 transform hover:scale-105 transition-all duration-300">
-                  Generate Shopping List
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    )
+  const toggleFavorite = (recipeId: string) => {
+    setFavoriteRecipes((prev) => (prev.includes(recipeId) ? prev.filter((id) => id !== recipeId) : [...prev, recipeId]))
+  }
+
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty) {
+      case "Easy":
+        return "bg-green-100 text-green-800"
+      case "Medium":
+        return "bg-yellow-100 text-yellow-800"
+      case "Hard":
+        return "bg-red-100 text-red-800"
+      default:
+        return "bg-gray-100 text-gray-800"
+    }
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 via-teal-50 to-cyan-50">
-      {/* Navigation */}
-      <nav className="bg-white/90 backdrop-blur-lg shadow-lg border-b sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <div className="relative">
-                <Heart className="h-8 w-8 text-green-600 animate-pulse" />
-                <Apple className="h-4 w-4 text-emerald-500 absolute -top-1 -right-1 animate-bounce" />
-              </div>
-              <span className="ml-2 text-xl font-bold bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 bg-clip-text text-transparent">
-                Hermitra Nutrition
-              </span>
-            </div>
-            <Link href="/dashboard">
-              <Button variant="outline" className="hover:bg-green-50 transition-all duration-300 bg-white/80">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Dashboard
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </nav>
-
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Header */}
+    <div className="pt-10 py-16 px-8 md:px-16 lg:px-24">
+      <div className="container mx-auto">
         <div className="text-center mb-12 animate-fade-in-up">
-          <div className="relative inline-block">
-            <h1 className="text-5xl font-bold bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 bg-clip-text text-transparent mb-4">
-              PCOS Nutrition Guide
-            </h1>
-            <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full animate-pulse"></div>
-          </div>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Discover PCOS-friendly foods, meal plans, and nutrition strategies to help manage symptoms, improve insulin
-            sensitivity, and support hormonal balance through proper nutrition.
-          </p>
+          <h1 className="text-4xl font-bold text-gray-800 mb-4">Nutrition Guide</h1>
+          <p className="text-lg text-gray-600">PCOS-friendly Nepali recipes and traditional foods</p>
         </div>
 
-        {/* Nutrition Stats */}
-        <div className="grid md:grid-cols-4 gap-6 mb-8">
-          <Card className="bg-gradient-to-br from-green-100 to-emerald-200 border-green-200 hover:shadow-xl transition-all duration-300 animate-fade-in-up animation-delay-100">
-            <CardContent className="p-6 text-center">
-              <Leaf className="h-8 w-8 text-green-600 mx-auto mb-2" />
-              <div className="text-2xl font-bold text-green-700">85%</div>
-              <div className="text-sm text-green-600">Anti-Inflammatory Foods</div>
+        {/* Daily Nutrition Overview */}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+          <Card className="border-pink-200 hover:shadow-lg transition-all duration-300 animate-fade-in-up">
+            <CardContent className="p-4 text-center">
+              <Zap className="h-6 w-6 text-orange-500 mx-auto mb-2" />
+              <p className="text-sm text-gray-600">Calories</p>
+              <p className="text-xl font-bold text-orange-600">{dailyIntake.calories}</p>
             </CardContent>
           </Card>
-          <Card className="bg-gradient-to-br from-blue-100 to-cyan-200 border-blue-200 hover:shadow-xl transition-all duration-300 animate-fade-in-up animation-delay-200">
-            <CardContent className="p-6 text-center">
-              <Zap className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-              <div className="text-2xl font-bold text-blue-700">Low GI</div>
-              <div className="text-sm text-blue-600">Glycemic Index Focus</div>
+
+          <Card
+            className="border-purple-200 hover:shadow-lg transition-all duration-300 animate-fade-in-up"
+            style={{ animationDelay: "0.1s" }}
+          >
+            <CardContent className="p-4 text-center">
+              <Heart className="h-6 w-6 text-red-500 mx-auto mb-2" />
+              <p className="text-sm text-gray-600">Protein</p>
+              <p className="text-xl font-bold text-red-600">{dailyIntake.protein}g</p>
             </CardContent>
           </Card>
-          <Card className="bg-gradient-to-br from-purple-100 to-pink-200 border-purple-200 hover:shadow-xl transition-all duration-300 animate-fade-in-up animation-delay-300">
-            <CardContent className="p-6 text-center">
-              <Shield className="h-8 w-8 text-purple-600 mx-auto mb-2" />
-              <div className="text-2xl font-bold text-purple-700">3</div>
-              <div className="text-sm text-purple-600">Meal Plans Available</div>
+
+          <Card
+            className="border-green-200 hover:shadow-lg transition-all duration-300 animate-fade-in-up"
+            style={{ animationDelay: "0.2s" }}
+          >
+            <CardContent className="p-4 text-center">
+              <Leaf className="h-6 w-6 text-green-500 mx-auto mb-2" />
+              <p className="text-sm text-gray-600">Carbs</p>
+              <p className="text-xl font-bold text-green-600">{dailyIntake.carbs}g</p>
             </CardContent>
           </Card>
-          <Card className="bg-gradient-to-br from-orange-100 to-red-200 border-orange-200 hover:shadow-xl transition-all duration-300 animate-fade-in-up animation-delay-400">
-            <CardContent className="p-6 text-center">
-              <Users className="h-8 w-8 text-orange-600 mx-auto mb-2" />
-              <div className="text-2xl font-bold text-orange-700">92%</div>
-              <div className="text-sm text-orange-600">Success Rate</div>
+
+          <Card
+            className="border-blue-200 hover:shadow-lg transition-all duration-300 animate-fade-in-up"
+            style={{ animationDelay: "0.3s" }}
+          >
+            <CardContent className="p-4 text-center">
+              <Apple className="h-6 w-6 text-blue-500 mx-auto mb-2" />
+              <p className="text-sm text-gray-600">Fiber</p>
+              <p className="text-xl font-bold text-blue-600">{dailyIntake.fiber}g</p>
+            </CardContent>
+          </Card>
+
+          <Card
+            className="border-cyan-200 hover:shadow-lg transition-all duration-300 animate-fade-in-up"
+            style={{ animationDelay: "0.4s" }}
+          >
+            <CardContent className="p-4 text-center">
+              <Droplets className="h-6 w-6 text-cyan-500 mx-auto mb-2" />
+              <p className="text-sm text-gray-600">Water</p>
+              <p className="text-xl font-bold text-cyan-600">{dailyIntake.water} cups</p>
             </CardContent>
           </Card>
         </div>
 
-        <Tabs defaultValue="foods" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 bg-white/80 backdrop-blur-sm mb-8">
-            <TabsTrigger
-              value="foods"
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500 data-[state=active]:to-emerald-500 data-[state=active]:text-white"
-            >
-              Food Guide
-            </TabsTrigger>
-            <TabsTrigger
-              value="meals"
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500 data-[state=active]:to-emerald-500 data-[state=active]:text-white"
-            >
-              Meal Plans
-            </TabsTrigger>
-            <TabsTrigger
-              value="tips"
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500 data-[state=active]:to-emerald-500 data-[state=active]:text-white"
-            >
-              Nutrition Tips
-            </TabsTrigger>
+        <Tabs defaultValue="recipes" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="recipes">Nepali Recipes</TabsTrigger>
+            <TabsTrigger value="superfoods">Local Superfoods</TabsTrigger>
+            <TabsTrigger value="meal-plans">Meal Plans</TabsTrigger>
+            <TabsTrigger value="tips">Nutrition Tips</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="foods" className="space-y-8">
-            {/* Search and Filter */}
-            <div className="flex flex-col md:flex-row gap-4 animate-fade-in-up">
-              <div className="relative flex-1">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input
-                  placeholder="Search foods..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {categories.map((category) => (
-                  <Button
-                    key={category}
-                    variant={selectedCategory === category ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => setSelectedCategory(category)}
-                    className={`${
-                      selectedCategory === category
-                        ? "bg-gradient-to-r from-green-500 to-emerald-500 text-white"
-                        : "hover:bg-green-50 bg-transparent"
-                    } transition-all duration-300`}
-                  >
-                    {category === "all" ? "All Foods" : category}
-                  </Button>
-                ))}
-              </div>
+          <TabsContent value="recipes" className="space-y-6">
+            {/* Search Bar */}
+            <div className="relative max-w-md mx-auto animate-fade-in-up">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder="Search Nepali recipes..."
+                className="pl-10 border-pink-200 focus:border-pink-400"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
 
-            {/* Foods to Eat */}
-            <div className="animate-fade-in-up animation-delay-100">
-              <h2 className="text-2xl font-bold text-green-700 mb-6 flex items-center">
-                <CheckCircle className="h-6 w-6 mr-2" />
-                Foods to Include
-              </h2>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {beneficialFoods.map((food, index) => (
-                  <Card
-                    key={food.id}
-                    className={`group hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 animate-fade-in-up animation-delay-${index * 50} bg-white/80 backdrop-blur-sm border-green-200`}
-                  >
-                    <div className="relative">
-                      <img
-                        src={food.image || "/placeholder.svg"}
-                        alt={food.name}
-                        className="w-full h-32 object-cover rounded-t-lg group-hover:scale-110 transition-transform duration-500"
-                      />
-                      <div className="absolute top-2 left-2">
-                        <Badge className="bg-green-500 text-white">{food.category}</Badge>
+            {/* Recipe Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredRecipes.map((recipe, index) => (
+                <Card
+                  key={recipe.id}
+                  className="border-pink-200 py-0 hover:shadow-xl transition-all duration-300 transform hover:scale-105 animate-fade-in-up"
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                >
+                  <CardHeader className="p-0">
+                  <div className="relative">
+  <img
+    src={recipe.image}
+    className="w-full h-48 rounded-t-lg object-cover"
+  />
+
+  {/* Utensils icon overlay */}
+ 
+
+  <Button
+    size="sm"
+    variant="ghost"
+    className="absolute top-2 right-2 bg-white/80 hover:bg-white"
+    onClick={() => toggleFavorite(recipe.id)}
+  >
+    <Heart
+      className={`h-4 w-4 ${
+        favoriteRecipes.includes(recipe.id)
+          ? "fill-red-500 text-red-500"
+          : "text-gray-400"
+      }`}
+    />
+  </Button>
+</div>
+
+                  </CardHeader>
+
+                  <CardContent className="px-4">
+                    <div className="mb-3">
+                      <h3 className="font-semibold text-gray-800 mb-1">{recipe.title}</h3>
+                      <Badge variant="secondary" className="text-xs">
+                        {recipe.category}
+                      </Badge>
+                    </div>
+
+                    <p className="text-sm text-gray-600 mb-3">{recipe.description}</p>
+
+                    <div className="flex items-center justify-between text-sm text-gray-600 mb-3">
+                      <div className="flex items-center space-x-3">
+                        <span className="flex items-center">
+                          <Clock className="h-4 w-4 mr-1" />
+                          {recipe.time}
+                        </span>
+                        <span className="flex items-center">
+                          <Star className="h-4 w-4 mr-1 text-yellow-500" />
+                          {recipe.rating}
+                        </span>
                       </div>
-                      <div className="absolute top-2 right-2">
-                        {food.antiInflammatory && (
-                          <Badge variant="outline" className="bg-white/90 text-green-600 border-green-300">
-                            Anti-inflammatory
+                      <Badge className={getDifficultyColor(recipe.difficulty)}>{recipe.difficulty}</Badge>
+                    </div>
+
+                    <div className="flex items-center justify-between text-sm mb-3">
+                      <span className="text-gray-600">{recipe.calories} cal</span>
+                      <span className="text-gray-600">{recipe.servings} servings</span>
+                    </div>
+
+                    {/* Nutrition Info */}
+                    {/* <div className="bg-green-50 p-2 rounded-lg mb-3">
+                      <p className="text-xs font-medium text-green-800 mb-1">Nutrition per serving:</p>
+                      <div className="grid grid-cols-2 gap-1 text-xs text-green-700">
+                        {Object.entries(recipe.nutrition).map(([key, value]) => (
+                          <span key={key}>
+                            {key.replace("_", " ")}: {value}
+                          </span>
+                        ))}
+                      </div>
+                    </div> */}
+
+                    <div className="flex flex-wrap gap-1 mb-3">
+                      {recipe.benefits.slice(0, 2).map((benefit, idx) => (
+                        <Badge key={idx} variant="outline" className="text-xs">
+                          {benefit}
+                        </Badge>
+                      ))}
+                    </div>
+
+                    <Button className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white transform hover:scale-105 transition-all duration-200 mb-2">
+                      <ChefHat className="h-4 w-4 mr-2" />
+                      View Recipe
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="superfoods" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {nepaliSuperfoods.map((food, index) => (
+                <Card
+                  key={index}
+                  className="border-green-200 hover:shadow-lg transition-all duration-300 transform hover:scale-105 animate-fade-in-up"
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                >
+                  <CardHeader>
+                    <CardTitle className="text-green-600 flex items-center">
+                      <Leaf className="h-5 w-5 mr-2" />
+                      {food.name}
+                    </CardTitle>
+                    <Badge variant="outline" className="w-fit">
+                      {food.category}
+                    </Badge>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div>
+                      <h4 className="font-medium text-gray-800 mb-2">Health Benefits:</h4>
+                      <div className="flex flex-wrap gap-1">
+                        {food.benefits.map((benefit, idx) => (
+                          <Badge key={idx} variant="secondary" className="text-xs">
+                            {benefit}
                           </Badge>
-                        )}
+                        ))}
                       </div>
                     </div>
 
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-lg">{food.name}</CardTitle>
-                      <div className="flex items-center space-x-2">
-                        <Badge
-                          variant="outline"
-                          className={`text-xs ${
-                            food.glycemicIndex === "low"
-                              ? "border-green-300 text-green-600"
-                              : food.glycemicIndex === "medium"
-                                ? "border-yellow-300 text-yellow-600"
-                                : "border-red-300 text-red-600"
-                          }`}
-                        >
-                          {food.glycemicIndex.toUpperCase()} GI
-                        </Badge>
-                      </div>
-                    </CardHeader>
-
-                    <CardContent>
-                      {food.benefits && (
-                        <div className="space-y-2">
-                          <h4 className="font-medium text-sm text-green-700">Benefits:</h4>
-                          <ul className="space-y-1">
-                            {food.benefits.slice(0, 3).map((benefit, idx) => (
-                              <li key={idx} className="flex items-start text-xs">
-                                <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-1.5 mr-2 flex-shrink-0"></div>
-                                {benefit}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-
-            {/* Foods to Avoid */}
-            <div className="animate-fade-in-up animation-delay-200">
-              <h2 className="text-2xl font-bold text-red-700 mb-6 flex items-center">
-                <XCircle className="h-6 w-6 mr-2" />
-                Foods to Limit or Avoid
-              </h2>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {avoidFoods.map((food, index) => (
-                  <Card
-                    key={food.id}
-                    className={`group hover:shadow-xl transition-all duration-500 transform hover:-translate-y-2 animate-fade-in-up animation-delay-${index * 50} bg-white/80 backdrop-blur-sm border-red-200`}
-                  >
-                    <div className="relative">
-                      <img
-                        src={food.image || "/placeholder.svg"}
-                        alt={food.name}
-                        className="w-full h-32 object-cover rounded-t-lg group-hover:scale-110 transition-transform duration-500 filter grayscale"
-                      />
-                      <div className="absolute top-2 left-2">
-                        <Badge className="bg-red-500 text-white">{food.category}</Badge>
-                      </div>
-                      <div className="absolute top-2 right-2">
-                        <AlertTriangle className="h-5 w-5 text-red-500" />
-                      </div>
+                    <div className="bg-blue-50 p-3 rounded-lg">
+                      <h4 className="font-medium text-blue-800 mb-1">Nutrition Facts:</h4>
+                      <p className="text-sm text-blue-700">{food.nutrition}</p>
                     </div>
 
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-lg">{food.name}</CardTitle>
-                      <div className="flex items-center space-x-2">
-                        <Badge
-                          variant="outline"
-                          className={`text-xs ${
-                            food.glycemicIndex === "low"
-                              ? "border-green-300 text-green-600"
-                              : food.glycemicIndex === "medium"
-                                ? "border-yellow-300 text-yellow-600"
-                                : "border-red-300 text-red-600"
-                          }`}
-                        >
-                          {food.glycemicIndex.toUpperCase()} GI
-                        </Badge>
-                      </div>
-                    </CardHeader>
-
-                    <CardContent>
-                      {food.concerns && (
-                        <div className="space-y-2">
-                          <h4 className="font-medium text-sm text-red-700">Concerns:</h4>
-                          <ul className="space-y-1">
-                            {food.concerns.slice(0, 3).map((concern, idx) => (
-                              <li key={idx} className="flex items-start text-xs">
-                                <div className="w-1.5 h-1.5 bg-red-500 rounded-full mt-1.5 mr-2 flex-shrink-0"></div>
-                                {concern}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+                    <div className="bg-pink-50 p-3 rounded-lg">
+                      <h4 className="font-medium text-pink-800 mb-1">PCOS Support:</h4>
+                      <p className="text-sm text-pink-700">{food.pcosSupport}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           </TabsContent>
 
-          <TabsContent value="meals" className="space-y-8">
-            <div className="animate-fade-in-up">
-              <h2 className="text-2xl font-bold text-green-700 mb-6">PCOS-Friendly Meal Plans</h2>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {mealPlans.map((plan, index) => (
-                  <Card
-                    key={plan.id}
-                    className={`group hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 animate-fade-in-up animation-delay-${index * 100} cursor-pointer bg-white/80 backdrop-blur-sm`}
-                    onClick={() => setSelectedMealPlan(plan)}
-                  >
-                    <div className="relative">
-                      <img
-                        src={plan.image || "/placeholder.svg"}
-                        alt={plan.name}
-                        className="w-full h-48 object-cover rounded-t-lg group-hover:scale-110 transition-transform duration-500"
-                      />
-                      <div className="absolute top-4 left-4 flex space-x-2">
-                        <Badge className="bg-green-500 text-white">{plan.duration}</Badge>
-                        <Badge
-                          variant="outline"
-                          className={`bg-white/90 ${
-                            plan.difficulty === "Easy"
-                              ? "text-green-600 border-green-300"
-                              : plan.difficulty === "Medium"
-                                ? "text-yellow-600 border-yellow-300"
-                                : "text-red-600 border-red-300"
-                          }`}
-                        >
-                          {plan.difficulty}
-                        </Badge>
+          <TabsContent value="meal-plans" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {mealPlans.map((plan, index) => (
+                <Card
+                  key={plan.day}
+                  className="border-purple-200 hover:shadow-lg transition-all duration-300 animate-fade-in-up"
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                >
+                  <CardHeader>
+                    <CardTitle className="text-purple-600">{plan.day}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-3">
+                      <div className="p-3 bg-yellow-50 rounded-lg">
+                        <p className="text-sm font-medium text-gray-800">Breakfast</p>
+                        <p className="text-sm text-gray-600">{plan.breakfast}</p>
+                      </div>
+                      <div className="p-3 bg-green-50 rounded-lg">
+                        <p className="text-sm font-medium text-gray-800">Lunch</p>
+                        <p className="text-sm text-gray-600">{plan.lunch}</p>
+                      </div>
+                      <div className="p-3 bg-blue-50 rounded-lg">
+                        <p className="text-sm font-medium text-gray-800">Dinner</p>
+                        <p className="text-sm text-gray-600">{plan.dinner}</p>
+                      </div>
+                      <div className="p-3 bg-pink-50 rounded-lg">
+                        <p className="text-sm font-medium text-gray-800">Snack</p>
+                        <p className="text-sm text-gray-600">{plan.snack}</p>
                       </div>
                     </div>
-
-                    <CardHeader>
-                      <CardTitle className="text-xl group-hover:text-green-600 transition-colors duration-300">
-                        {plan.name}
-                      </CardTitle>
-                      <CardDescription>{plan.description}</CardDescription>
-                    </CardHeader>
-
-                    <CardContent>
-                      <div className="space-y-4">
-                        <div>
-                          <h4 className="font-medium text-sm mb-2">Benefits:</h4>
-                          <div className="flex flex-wrap gap-1">
-                            {plan.benefits.map((benefit, idx) => (
-                              <Badge key={idx} variant="outline" className="text-xs">
-                                {benefit}
-                              </Badge>
-                            ))}
-                          </div>
-                        </div>
-
-                        <Button className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 transform hover:scale-105 transition-all duration-300">
-                          View Meal Plan
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+                    <Button className="w-full bg-purple-500 hover:bg-purple-600 transform hover:scale-105 transition-all duration-200">
+                      <BookOpen className="h-4 w-4 mr-2" />
+                      View Full Plan
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           </TabsContent>
 
-          <TabsContent value="tips" className="space-y-8">
-            <div className="animate-fade-in-up">
-              <h2 className="text-2xl font-bold text-green-700 mb-6">PCOS Nutrition Tips</h2>
-              <div className="grid md:grid-cols-2 gap-8">
-                <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
-                  <CardHeader>
-                    <CardTitle className="text-green-700 flex items-center">
-                      <Zap className="h-5 w-5 mr-2" />
-                      Blood Sugar Management
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="flex items-start space-x-2">
-                      <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
-                      <p className="text-sm">Choose low glycemic index foods to prevent blood sugar spikes</p>
-                    </div>
-                    <div className="flex items-start space-x-2">
-                      <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
-                      <p className="text-sm">Eat protein with every meal to stabilize blood sugar</p>
-                    </div>
-                    <div className="flex items-start space-x-2">
-                      <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
-                      <p className="text-sm">Avoid refined sugars and processed carbohydrates</p>
+          <TabsContent value="tips" className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {nutritionTips.map((tip, index) => (
+                <Card
+                  key={index}
+                  className="border-green-200 hover:shadow-lg transition-all duration-300 transform hover:scale-105 animate-fade-in-up"
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                >
+                  <CardContent className="p-6">
+                    <div className="flex items-start space-x-4">
+                      <div className="p-2 bg-green-100 rounded-lg">{tip.icon}</div>
+                      <div>
+                        <h3 className="font-semibold text-gray-800 mb-2">{tip.title}</h3>
+                        <p className="text-gray-600">{tip.description}</p>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
-
-                <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 border-blue-200">
-                  <CardHeader>
-                    <CardTitle className="text-blue-700 flex items-center">
-                      <Shield className="h-5 w-5 mr-2" />
-                      Anti-Inflammatory Foods
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="flex items-start space-x-2">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
-                      <p className="text-sm">Include omega-3 rich foods like fatty fish and walnuts</p>
-                    </div>
-                    <div className="flex items-start space-x-2">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
-                      <p className="text-sm">Add colorful vegetables and fruits high in antioxidants</p>
-                    </div>
-                    <div className="flex items-start space-x-2">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
-                      <p className="text-sm">Use herbs and spices like turmeric and ginger</p>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-gradient-to-br from-purple-50 to-pink-50 border-purple-200">
-                  <CardHeader>
-                    <CardTitle className="text-purple-700 flex items-center">
-                      <Clock className="h-5 w-5 mr-2" />
-                      Meal Timing
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="flex items-start space-x-2">
-                      <div className="w-2 h-2 bg-purple-500 rounded-full mt-2"></div>
-                      <p className="text-sm">Eat regular meals to maintain stable blood sugar</p>
-                    </div>
-                    <div className="flex items-start space-x-2">
-                      <div className="w-2 h-2 bg-purple-500 rounded-full mt-2"></div>
-                      <p className="text-sm">Consider intermittent fasting under medical supervision</p>
-                    </div>
-                    <div className="flex items-start space-x-2">
-                      <div className="w-2 h-2 bg-purple-500 rounded-full mt-2"></div>
-                      <p className="text-sm">Don't skip breakfast to kickstart metabolism</p>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="bg-gradient-to-br from-orange-50 to-red-50 border-orange-200">
-                  <CardHeader>
-                    <CardTitle className="text-orange-700 flex items-center">
-                      <Heart className="h-5 w-5 mr-2" />
-                      Portion Control
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="flex items-start space-x-2">
-                      <div className="w-2 h-2 bg-orange-500 rounded-full mt-2"></div>
-                      <p className="text-sm">Use smaller plates to control portion sizes</p>
-                    </div>
-                    <div className="flex items-start space-x-2">
-                      <div className="w-2 h-2 bg-orange-500 rounded-full mt-2"></div>
-                      <p className="text-sm">Fill half your plate with non-starchy vegetables</p>
-                    </div>
-                    <div className="flex items-start space-x-2">
-                      <div className="w-2 h-2 bg-orange-500 rounded-full mt-2"></div>
-                      <p className="text-sm">Practice mindful eating and chew slowly</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
+              ))}
             </div>
+
+            {/* Additional Tips Section */}
+            <Card className="border-pink-200 animate-fade-in-up">
+              <CardHeader>
+                <CardTitle className="text-pink-600">PCOS Nutrition Guidelines with Nepali Foods</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h4 className="font-medium text-gray-800 mb-3">Traditional Foods to Include:</h4>
+                    <ul className="space-y-2 text-sm text-gray-600">
+                      <li className="flex items-center">
+                        <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                        Gundruk and fermented vegetables
+                      </li>
+                      <li className="flex items-center">
+                        <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                        Buckwheat and millet grains
+                      </li>
+                      <li className="flex items-center">
+                        <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                        Local leafy greens (sisnu, palungo)
+                      </li>
+                      <li className="flex items-center">
+                        <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                        Traditional legumes (bhatmas, kerau)
+                      </li>
+                      <li className="flex items-center">
+                        <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
+                        Seasonal fruits (lapsi, amala)
+                      </li>
+                    </ul>
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-gray-800 mb-3">Foods to Limit:</h4>
+                    <ul className="space-y-2 text-sm text-gray-600">
+                      <li className="flex items-center">
+                        <XCircle className="h-4 w-4 text-red-500 mr-2" />
+                        Refined white rice and flour
+                      </li>
+                      <li className="flex items-center">
+                        <XCircle className="h-4 w-4 text-red-500 mr-2" />
+                        Sugary sweets and mithai
+                      </li>
+                      <li className="flex items-center">
+                        <XCircle className="h-4 w-4 text-red-500 mr-2" />
+                        Deep-fried snacks (sel roti, pakoda)
+                      </li>
+                      <li className="flex items-center">
+                        <XCircle className="h-4 w-4 text-red-500 mr-2" />
+                        Processed instant noodles
+                      </li>
+                      <li className="flex items-center">
+                        <XCircle className="h-4 w-4 text-red-500 mr-2" />
+                        Excessive tea with sugar
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>

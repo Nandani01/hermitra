@@ -1,5 +1,6 @@
 "use client"
-
+import { format } from "date-fns";
+import { enUS } from "date-fns/locale";
 import * as React from "react"
 import {
   ChevronDownIcon,
@@ -190,7 +191,7 @@ function CalendarDayButton({
       ref={ref}
       variant="ghost"
       size="icon"
-      data-day={day.date.toLocaleDateString()}
+data-day={format(day.date, "yyyy-MM-dd", { locale: enUS })}
       data-selected-single={
         modifiers.selected &&
         !modifiers.range_start &&

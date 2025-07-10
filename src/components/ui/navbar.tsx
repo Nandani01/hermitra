@@ -44,12 +44,7 @@ export default function Navbar() {
             href="/"
             className="flex items-center space-x-3 hover:opacity-80 transition-opacity"
           >
-            <div className="w-10 h-10 bg-gradient-to-r from-pink-500 to-purple-600 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-lg">H</span>
-            </div>
-            <span className="text-2xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
-              Hermitra
-            </span>
+            <img src="/photos/logo.png" className="h-16"/>
           </Link>
 
           {/* Navigation items */}
@@ -61,13 +56,13 @@ export default function Navbar() {
               Ultrasound
             </Link>
             <Link
-              href="/assessment"
+              href="dashboard/assessment"
               className="text-gray-700 hover:text-pink-600 font-medium transition-colors"
             >
               Assessment
             </Link>
             <Link
-              href="/doctors"
+              href="/dashboard/doctors"
               className="text-gray-700 hover:text-pink-600 font-medium transition-colors"
             >
               Doctors
@@ -83,13 +78,13 @@ export default function Navbar() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem asChild>
-                  <Link href="/tracker/period">Period</Link>
+                  <Link href="/dashboard/period">Period</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/tracker/exercise">Exercise</Link>
+                  <Link href="/dashboard/exercise">Exercise</Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/tracker/daily">Daily</Link>
+                  <Link href="/dashboard/nutrition">Nutrition</Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -116,7 +111,7 @@ export default function Navbar() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem asChild>
-                  <Link href="/dashboard">Dashboard</Link>
+                  <Link href="/dashboard/tracker">Dashboard</Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleLogout}>
