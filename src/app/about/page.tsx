@@ -3,9 +3,15 @@ import { Heart, Users, Target, Award } from "lucide-react"
 
 export default function About() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50">
+    <div className="">
       {/* Hero Section */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 min-h-screen"
+       style={{
+      backgroundImage:'url(/photos/bg2.png)',
+      backgroundRepeat:"no-repeat",
+      backgroundSize:"cover",
+
+    }}>
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent mb-6">
             About Hermitra
@@ -18,19 +24,19 @@ export default function About() {
       </section>
 
       {/* Mission Section */}
-      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-white/50">
+      <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-pink-50 to-purple-50">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Our Mission</h2>
+            <h2 className="text-4xl font-bold text-pink-500 mb-4">Our Mission</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               To provide comprehensive, accessible, and personalized PCOS support that empowers women to take control of
               their health and live their best lives.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="bg-gradient-to-r from-pink-100 to-purple-100 rounded-full p-6 w-24 h-24 mx-auto mb-6 flex items-center justify-center">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="text-center pr-2 border-r-2">
+              <div className="bg-gradient-to-r from-pink-100 to-purple-100 rounded-full p-6 w-24 h-24 mx-auto mb-6 flex items-center justify-center animate-bounce">
                 <Heart className="w-12 h-12 text-pink-600" />
               </div>
               <h3 className="text-xl font-semibold text-gray-800 mb-3">Compassionate Care</h3>
@@ -39,8 +45,8 @@ export default function About() {
               </p>
             </div>
 
-            <div className="text-center">
-              <div className="bg-gradient-to-r from-purple-100 to-indigo-100 rounded-full p-6 w-24 h-24 mx-auto mb-6 flex items-center justify-center">
+            <div className="text-center pr-2 border-r-2">
+              <div className="bg-gradient-to-r from-purple-100 to-indigo-100 rounded-full p-6 w-24 h-24 mx-auto mb-6 flex items-center justify-center animate-bounce">
                 <Users className="w-12 h-12 text-purple-600" />
               </div>
               <h3 className="text-xl font-semibold text-gray-800 mb-3">Community First</h3>
@@ -49,8 +55,8 @@ export default function About() {
               </p>
             </div>
 
-            <div className="text-center">
-              <div className="bg-gradient-to-r from-indigo-100 to-blue-100 rounded-full p-6 w-24 h-24 mx-auto mb-6 flex items-center justify-center">
+            <div className="text-center pr-2 border-r-2">
+              <div className="bg-gradient-to-r from-indigo-100 to-blue-100 rounded-full p-6 w-24 h-24 mx-auto mb-6 flex items-center justify-center animate-bounce">
                 <Target className="w-12 h-12 text-indigo-600" />
               </div>
               <h3 className="text-xl font-semibold text-gray-800 mb-3">Evidence-Based</h3>
@@ -59,8 +65,8 @@ export default function About() {
               </p>
             </div>
 
-            <div className="text-center">
-              <div className="bg-gradient-to-r from-blue-100 to-green-100 rounded-full p-6 w-24 h-24 mx-auto mb-6 flex items-center justify-center">
+            <div className="text-center ">
+              <div className="bg-gradient-to-r from-blue-100 to-green-100 rounded-full p-6 w-24 h-24 mx-auto mb-6 flex items-center justify-center animate-bounce">
                 <Award className="w-12 h-12 text-blue-600" />
               </div>
               <h3 className="text-xl font-semibold text-gray-800 mb-3">Excellence</h3>

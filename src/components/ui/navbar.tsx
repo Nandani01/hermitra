@@ -65,7 +65,7 @@ export default function Navbar() {
               href="/dashboard/doctors"
               className="text-gray-700 hover:text-pink-600 font-medium transition-colors"
             >
-              Doctors
+              Experts
             </Link>
 
             {/* Tracker Dropdown */}
@@ -124,4 +124,12 @@ export default function Navbar() {
       </div>
     </header>
   );
+}
+
+function mobileNav(){
+  return(
+  <div className="sm:hidden flex ">
+
+  </div>
+  )
 }

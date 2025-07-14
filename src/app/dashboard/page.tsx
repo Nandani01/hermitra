@@ -318,9 +318,16 @@ export default function Dashboard() {
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-purple-50 to-indigo-50">
     
       {/* Welcome Section */}
-      <section className="py-12 px-4 relative overflow-hidden">
+      <section className="py-12 px-4 relative overflow-hidden"
+       >
         {/* Background Elements */}
-        <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute inset-0 overflow-hidden"
+        style={{
+    backgroundImage: `url('/photos/bg2.png')`,
+    backgroundRepeat: "no-repeat",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+  }}>
           <div className="absolute top-10 left-10 w-48 h-48 bg-gradient-to-r from-pink-300/20 to-purple-300/20 rounded-full blur-3xl animate-pulse"></div>
           <div className="absolute bottom-10 right-10 w-64 h-64 bg-gradient-to-r from-purple-300/20 to-indigo-300/20 rounded-full blur-3xl animate-pulse animation-delay-1000"></div>
         </div>

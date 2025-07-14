@@ -87,8 +87,15 @@ export default function Assessment() {
     const risk = calculateRisk()
 
     return (
-      <div className="pt-20 py-16 px-4">
-        <div className="container mx-auto max-w-2xl">
+      <div className="pt-20 py-16 px-4"
+       style={{
+    backgroundImage: `url('/photos/bg3.png')`,
+    backgroundRepeat: "no-repeat",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+  }}>
+        <div className="container mx-auto max-w-2xl" 
+        > 
           <Card className="border-purple-200">
             <CardHeader className="text-center">
               <CardTitle className="text-2xl text-purple-600">Assessment Results</CardTitle>
@@ -154,8 +161,15 @@ export default function Assessment() {
   }
 
   return (
-    <div className="pt-20 py-16 px-4">
-      <div className="container mx-auto max-w-2xl">
+    <div className="pt-20 py-16 px-4"
+     style={{
+    backgroundImage: `url('/photos/bg3.png')`,
+    backgroundRepeat: "no-repeat",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+  }}>
+      <div className="container mx-auto max-w-2xl"
+      >
         <Card className="border-purple-200">
           <CardHeader className="text-center">
             <CardTitle className="text-2xl text-purple-600">PCOS Risk Assessment</CardTitle>
